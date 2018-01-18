@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="documentation.css">
+    <title>Документация к игре "Жизнь"</title>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <th>Название функции</th>
+            <th>Код функции</th>
+            <th>Предназначение</th>
+        </tr>
+        <tr>
+            <td>masZero()</td>
+            <td>
+                <pre> var n = ObjLife.rowsCount,
+        m = ObjLife.columnCount;
+    for (var i = 0; i < n; i++) {
+        ObjLife.masLife[i] = [];
+        for (var j = 0; j < m; j++) {
+            ObjLife.masLife[i][j] = 0;
+        }
+    }</pre>
+            </td>
+            <td>Функция создает двумерный массив и заполняет его нулями.</td>
+        </tr>
+        <tr>
+            <td>installCage() </td>
+            <td>
+                <pre> var columnCount = ObjLife.columnCount,
+        rowsCount = ObjLife.rowsCount,
+        SHIFT = 10;
+
+    ObjLife.context.strokeStyle = "#000";
+    ObjLife.context.clearRect(0, 0, ObjLife.width, ObjLife.height);
+    for (var i = 0; i < ObjLife.rowsCount; i++) {
+        for (var j = 0; j < ObjLife.columnCount; j++) {
+            if (ObjLife.masLife[i][j] == 1) {
+                ObjLife.context.fillRect(j * 10, i * 10, 10, 10);
+            }
+        }
+    }
+
+    //Прорисовка сетки.
+    ObjLife.context.strokeStyle = "hsla(0, 100%, 70%, 0.3)";
+    for (var n = 0; n < columnCount; n++) {
+        ObjLife.context.moveTo(n * SHIFT, 0);
+        ObjLife.context.lineTo(n * SHIFT, rowsCount * SHIFT);
+        ObjLife.context.stroke();
+    }
+    for (n = 0; n < rowsCount; n++) {
+        ObjLife.context.moveTo(0, n * SHIFT);
+        ObjLife.context.lineTo(columnCount * SHIFT, n * SHIFT);
+        ObjLife.context.stroke();
+    }</pre>
+            </td>
+            <td>Прорисовка текущего цикла жизни и прорисовка сетки.</td>
+        </tr>
+        <tr>
+            <td>addLife(event)</td>
+            <td>
+                <pre> var x = event.offsetX;
+    var y = event.offsetY;
+    x = Math.floor(x / 10);
+    y = Math.floor(y / 10);
+    ObjLife.masLife[y][x] = 1;
+    installCage();</pre>
+            </td>
+            <td>Функция вычисляет координаты точки, по которой нажал пользователь и вселяет туда жизнь, в эту клетку.</td>
+        </tr>
+        <tr>
+            <td>ObjLife</td>
+            <td>
+                <pre>var ObjLife = {
+    masLife: [],
+    timeShift: 1000,
+    timerID: 0,
+    isStarted: false,
+    cell__field: document.getElementById("cell__field"),
+    context: cell__field.getContext("2d"),
+    rowsCount: 0,
+    columnCount: 0,
+    width: 0,
+    height: 0
+}</pre>
+            </td>
+            <td>Сам объект "Жизнь"</td>
+        </tr>
+        <tr>
+            <td>LifeCycle()</td>
+            <td>
+                <pre> var mass = [];
+    for (var i = 0; i < ObjLife.rowsCount; i++) {
+        mass[i] = [];
+        for (var j = 0; j < ObjLife.columnCount; j++) {
+            if (LifeOrDeath(j, i)) {
+                mass[i][j] = 1;
+            } else {
+                mass[i][j] = 0;
+            }
+        }
+    }
+
+    ObjLife.masLife = mass;
+    installCage();</pre>
+            </td>
+            <td>Функция создает массив из клеток и если пользователь нажал на какую-то из них, то вызывается функция "installCage()", которая и прорисовывает в данной клетке жизнь. Таким образом создается один цикл жизни. </td>
+        </tr>
+        <tr>
+            <td>LifeOrDeath(x, y)</td>
+            <td> Большой код </td>
+            <td>Функция проверяет наличие соседей у клетки, а также количество соседей у клетки. В зависимости от количества соседей, потом прорисовываются новые и новые цикли жизни. Аргументами являются Х и У - это координаты границ поля для рисования.</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <pre>document.getElementsByClassName("menu-list__item")[0].addEventListener("click", function () {
+    LifeCycle();
+});</pre>
+            </td>
+            <td>Запуск одной итерации игры. Вызывается функция создания и прорисовки одного цикла жизни.</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <pre>document.getElementsByClassName("menu-list__item")[1].addEventListener("click", function (event) {
+    if (ObjLife.isStarted == false) {
+        startLife();
+        ObjLife.isStarted = true;
+        event.target.innerHTML = "Стоп";
+    } else {
+        ObjLife.isStarted = false;
+        event.target.innerHTML = "Старт";
+        clearInterval(ObjLife.timerID);
+
+    }
+    document.getElementById("cell__field").removeEventListener("click", addLife);
+});</pre>
+            </td>
+            <td>Запускает и останавливает игру.</td>
+        </tr>
+        <tr>
+            <td>startLife() </td>
+            <td>
+                <pre>ObjLife.timeShift = document.getElementById("inpRange").value;
+    console.log(ObjLife.timeShift);
+    ObjLife.timerID = setInterval(LifeCycle, ObjLife.timeShift);</pre>
+            </td>
+            <td>Эта функция позволяет регулировать скорость создания новых циклов жизни.</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <pre>document.getElementsByClassName("menu-list__item")[2].addEventListener("click", function (event) {
+    masZero();
+    ObjLife.context.clearRect(0, 0, ObjLife.width, ObjLife.height);
+    ObjLife.cell__field.addEventListener("click", addLife);
+
+
+});</pre>
+            </td>
+            <td>Очистка поля и данных для игры.</td>
+        </tr>
+        <tr>
+            <td>resizeCanva() </td>
+            <td>
+                <pre>var w = 0,
+        h = 0,
+        HEADERSIZE = 100,
+        UNITS = "px",
+        squareSize = 0; //длина одной стороны квадрата
+    //считывание размера экрана
+    w = window.innerWidth;
+    h = window.innerHeight;
+
+    console.log(w, h);
+
+    h -= HEADERSIZE;
+    console.log(w, h);
+    
+    //В коде есть проверка еще
+    
+    ObjLife.cell__field.width = squareSize;
+    ObjLife.cell__field.height = squareSize;
+
+    ObjLife.rowsCount = squareSize / 10;
+    ObjLife.columnCount = squareSize / 10;
+
+    ObjLife.width = squareSize;
+    ObjLife.height = squareSize;
+</pre>
+            </td>
+            <td>Эта функция считывает размер экрана и меняет размер поля для рисования.</td>
+        </tr>
+    </table>
+
+
+
+
+
+</body>
+
+</html>
